@@ -63,6 +63,9 @@
 
 frequencies <- function(file, nLoci) {
 
+# Load the data data.table library
+library(data.table)
+  
 #-------------------------------#
 #   Get Allele Frequencies      #
 #-------------------------------#
@@ -70,7 +73,7 @@ frequencies <- function(file, nLoci) {
 #--- Table for holding results ---#
 freqs <- data.frame(matrix(NA, nrow = 2, ncol = nLoci))
 
-genotypes <- fread(file, header = FALSE, sep = ",")
+genotypes <- data.frame(fread(file, header = FALSE, sep = ","))
 
 # Loop through loci
 for (i in 1:nLoci) {
@@ -137,8 +140,8 @@ allele_inheritance <- rep(NA, times = nTriads)
 library(data.table)
 
 # Read in data
-parents1 <- fread(pfile, header = FALSE, sep = ",")
-offspring1 <- fread(ofile, header = FALSE, sep = ",")
+parents1 <- data.frame(fread(pfile, header = FALSE, sep = ","))
+offspring1 <- data.frame(fread(ofile, header = FALSE, sep = ","))
 
 for (i in 1:nTriads) {
   
@@ -166,7 +169,7 @@ for (i in 1:nTriads) {
     #---------------------------------------------------------#
     parents <- parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)]
     offspring <- offspring1[i, c(j * 2, (j * 2) + 1)]
-    freqs <- fread(ffile, header = FALSE, sep = ",", select = c(j))
+    freqs <- data.frame(fread(ffile, header = FALSE, sep = ",", select = c(j)))
 
     
     #-----------------------------------#
@@ -304,7 +307,7 @@ mendel <- function(pfile, nTriads, nLoci, n) {
 offspring <- matrix(NA, nrow = nTriads, ncol = ((2 * nLoci) + 1))
 
 # Get parental data
-parents1 <- fread(pfile, header = FALSE, sep = ",")
+parents1 <- data.frame(fread(pfile, header = FALSE, sep = ","))
 
 for (i in 1:nTriads) {
   
@@ -353,10 +356,10 @@ aisim <- function(pfile, ffile, nLoci, nTriads, n) {
   allele_inheritance <- rep(NA, times = nTriads)
   
   # Read in offspring file
-  offspring1 <- fread("simOff.csv", header = FALSE, sep = ",")
+  offspring1 <- data.frame(fread("simOff.csv", header = FALSE, sep = ","))
   
   # Read in parental file
-  parents1 <- fread(pfile, header = FALSE, sep = ",")
+  parents1 <- data.frame(fread(pfile, header = FALSE, sep = ","))
   
   for (i in 1:nTriads) {
     
@@ -385,7 +388,7 @@ aisim <- function(pfile, ffile, nLoci, nTriads, n) {
       parents <- parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)]
       offspring <- offspring1[i, c(j * 2, (j * 2) + 1)]
       
-      freqs <- fread(ffile, header = FALSE, sep = ",", select = c(j))
+      freqs <- data.frame(fread(ffile, header = FALSE, sep = ",", select = c(j)))
       
       
       #-----------------------------------#

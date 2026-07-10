@@ -65,12 +65,12 @@ Instructions and notes are also present within the code itself that may be helpf
 
 3. Make sure that you have the `data.table` package installed    
 
-3. Use the `frequencies` function to calculate the allele frequencies. This will write the results to a file called `freqs.csv` in R's working directory. Requires two arguments:    
+4. Use the `frequencies` function to calculate the allele frequencies. This will write the results to a file called `freqs.csv` in R's working directory. Requires two arguments:    
     a. The name and relative path to the genotypes file ("file"). File *must* be comma-delimited    
     b. The number of loci ("nLoci")    
 `frequencies(file = "../data/genotypes_5000.csv", nLoci = 5000)`
 
-4. Use the `ai` function ("ai" for allele inheritance, *not* artificial intelligence) to calculate observed allele inheritance. This will write the results (a single column with one value for each triad) into a file called `observed_ai.csv` within R's working directory. Requires five arguments:    
+5. Use the `ai` function ("ai" for allele inheritance, *not* artificial intelligence) to calculate observed allele inheritance. This will write the results (a single column with one value for each triad) into a file called `observed_ai.csv` within R's working directory. Requires five arguments:    
     a. The name and relative path to the parental genotype file ("pfile"). File *must* be comma-delimited    
     b. The name and relative path to the offspring genotype file ("ofile"). File *must* be comma-delimited    
     c. The name and relative path to the allele frequency file ("ffile")    
@@ -78,7 +78,7 @@ Instructions and notes are also present within the code itself that may be helpf
     e. The number of mother-father-triads ("nTriads")    
 `ai(pfile = "../data/parents_5000.csv", ofile = "../data/offspring_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3)`
 
-5. Use the `sim` function to generate simulated offspring from each parental pair. **This will take a while to run!** Progress updates will be written to your screen so that you can keep track of progress. But you will need to be patient and have other things to do in the meantime (or perhaps go to sleep and check it in the morning). The output will be a file called `sim_ai.csv` that contains *one value* for each iteration (the average ai across *all* simulated  offspring for that iteration). The result will be a distribution of expected allele inheritance values given just Mendelian inheritance. Requires five arguments:    
+6. Use the `sim` function to generate simulated offspring from each parental pair. **This will take a while to run!** Progress updates will be written to your screen so that you can keep track of progress. But you will need to be patient and have other things to do in the meantime (or perhaps go to sleep and check it in the morning). The output will be a file called `sim_ai.csv` that contains *one value* for each iteration (the average ai across *all* simulated  offspring for that iteration). The result will be a distribution of expected allele inheritance values given just Mendelian inheritance. Requires five arguments:    
     a. The name and relative path to the parental genotype file ("pfile"). File *must* be comma-delimited    
     b. The name and relative path to the allele frequency file ("ffile")    
     c. The number of loci ("nLoci")    
@@ -86,7 +86,7 @@ Instructions and notes are also present within the code itself that may be helpf
     e. The number of iterations that you want to conduct (i.e., how many simulated offspring do you want to generate for each parental pair?). I just use 50 here, but to get a good distribution of "expected" values, you should run more (e.g., 1000).    
 `sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, iterations = 50)`
 
-6. You can then compare and visualize the difference between observed and expected values using standard R functions. One example is to plot a histogram of the expected values, and then a red dashed line where the observed value is. Example commands for this are below. *Note that the calculation is how often a paternal allele is inherited that is different from the maternal allele, so observed values larger than expected mean that homozygotes are missing from your data set, and vice versa.*     
+7. You can then compare and visualize the difference between observed and expected values using standard R functions. One example is to plot a histogram of the expected values, and then a red dashed line where the observed value is. Example commands for this are below. *Note that the calculation is how often a paternal allele is inherited that is different from the maternal allele, so observed values larger than expected mean that homozygotes are missing from your data set, and vice versa.*     
 `observed <- read.table("observed_ai.csv", header = FALSE, sep = ",")`    
 `expected <- read.table("sim_ai.csv", header = FALSE, sep = ",")`    
 `library(ggplot2)`    
