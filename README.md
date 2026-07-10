@@ -83,8 +83,8 @@ Instructions and notes are also present within the code itself that may be helpf
     b. The name and relative path to the allele frequency file ("ffile")    
     c. The number of loci ("nLoci")    
     d. The number of triads ("nTriads")    
-    e. The number of iterations that you want to conduct (i.e., how many simulated offspring do you want to generate for each parental pair?). I just use 50 here, but to get a good distribution of "expected" values, you should run more (e.g., 1000).    
-`sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, iterations = 50)`
+    e. The number of iterations that you want to conduct (i.e., how many simulated offspring do you want to generate for each parental pair?). I just use 20 here, but to get a good distribution of "expected" values, you should run more (e.g., 500 or 1000).    
+`sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, iterations = 10)`
 
 7. You can then compare and visualize the difference between observed and expected values using standard R functions. One example is to plot a histogram of the expected values, and then a red dashed line where the observed value is. Example commands for this are below. *Note that the calculation is how often a paternal allele is inherited that is different from the maternal allele, so observed values larger than expected mean that homozygotes are missing from your data set, and vice versa.*     
 `observed <- read.table("observed_ai.csv", header = FALSE, sep = ",")`    

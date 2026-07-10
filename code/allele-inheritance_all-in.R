@@ -277,6 +277,7 @@ sim <- function(pfile, ffile, nLoci, nTriads, iterations) {
     sim_ai[n] <- aisim(pfile = pfile, ffile = ffile, nLoci = nLoci, nTriads = nTriads, n = n)
   }
   write.table(sim_ai, "sim_ai.csv", sep = ",", quote = FALSE, row.names = FALSE, col.names = FALSE)
+  file.remove("simOff.csv")
   print("Done! Results written to file sim_ai.csv.")
 }  
   
