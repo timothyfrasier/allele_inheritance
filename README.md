@@ -10,17 +10,17 @@ These instructions assume that the files are laid out as follows:
     - You have set R's working directory to the
       "code" directory    
 
-|-| code/    
-|   |- allele-inheritance_all-in.R    
-|   |- allele-inheritance_partial.R    
+|   -| code/    
+|       |- allele-inheritance_all-in.R    
+|       |- allele-inheritance_partial.R    
 |    
-|-| data/    
-|   |- genotypes_full.csv    
-|   |- genotypes_5000.csv    
-|   |- offspring_5000.csv    
-|   |- offspring_full.csv    
-|   |- parents_5000.csv    
-|   |- parents_full.csv    
+|   -| data/    
+|       |- genotypes_full.csv    
+|       |- genotypes_5000.csv    
+|       |- offspring_5000.csv    
+|       |- offspring_full.csv    
+|       |- parents_5000.csv    
+|       |- parents_full.csv    
 
 Instructions and notes are also present within the code itself that may be helpful as a guide.    
 
