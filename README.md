@@ -87,21 +87,21 @@ Instructions and notes are also present within the code itself that may be helpf
 `sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, iterations = 50)`
 
 6. You can then compare and visualize the difference between observed and expected values using standard R functions. One example is to plot a histogram of the expected values, and then a red dashed line where the observed value is. Example commands for this are below. *Note that the calculation is how often a paternal allele is inherited that is different from the maternal allele, so observed values larger than expected mean that homozygotes are missing from your data set, and vice versa.*     
-`observed <- read.table("observed_ai.csv", header = FALSE, sep = ",")    
-expected <- read.table("sim_ai.csv", header = FALSE, sep = ",")    
-library(ggplot2)    
-ggplot(expected) +    
-   theme_bw() +    
-   geom_histogram(aes(x = V1), alpha = 0.6) +    
-   geom_vline(xintercept = mean(observed$V1), color = "red", linewidth = 1.5, linetype = "dashed") +    
-   xlab("Allele Inheritance") +    
-   ylab("Frequency")`
+`observed <- read.table("observed_ai.csv", header = FALSE, sep = ",")`    
+`expected <- read.table("sim_ai.csv", header = FALSE, sep = ",")`    
+`library(ggplot2)`    
+`ggplot(expected) +`    
+`   theme_bw() +`    
+`   geom_histogram(aes(x = V1), alpha = 0.6) +`    
+`   geom_vline(xintercept = mean(observed$V1), color = "red", linewidth = 1.5, linetype = "dashed") +`    
+`   xlab("Allele Inheritance") +`    
+`   ylab("Frequency")`    
 -----
 
 ## Running analyses reading only a portion of the data files into R at a time (example using the 5000 SNP data set, but can also use with larger data set).
 
-The commands for this are the same as above, except for which script you read in.    
-`source("allele-inheritance_partial.R")
+The commands for this are the same as above, except for which script you read in.        
+`source("allele-inheritance_partial.R")`
 
 ## References
 Frasier TR (2008) STORM: Software for testing hypotheses of relatedness and mating patterns. *Molecular Ecology Resources* **8**: 1264-1266.
