@@ -18,9 +18,9 @@ These instructions assume that the files are laid out as follows:
 |--| data/     
 |-----|- genotypes_20.csv    
 |-----|- genotypes_full.csv    
-|-----|- genotypes_5000.csv
-|-----|- offspring_20.csv
-|-----|- offspring_5000.csv    
+|-----|- genotypes_5000.csv    
+|-----|- offspring_20.csv    
+|-----|- offspring_5000.csv     
 |-----|- offspring_full.csv   
 |-----|- parents_20.csv    
 |-----|- parents_5000.csv    
@@ -133,6 +133,7 @@ You could then plot the **ai** of the 'kept' offspring to see if the result is s
 `   ylab("Frequency")`    
 
 Again you can incrementally increase the cut-off value for heterozygosity until the expected data resemble the observed. From those data, you can get an estimate of the proportion of fetuses that are lost.
+
 -----
 
 ## Running analyses reading only a portion of the data files into R at a time (example using the 5000 SNP data set, but can also use with larger data set).
