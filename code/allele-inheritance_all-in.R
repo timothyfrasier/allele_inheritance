@@ -167,9 +167,9 @@ for (i in 1:nTriads) {
     #---------------------------------------------------------#
     # Get appropriate parental, offspring, and frequency data #
     #---------------------------------------------------------#
-    parents <- parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)]
-    offspring <- offspring1[i, c(j * 2, (j * 2) + 1)]
-    freqs <- data.frame(fread(ffile, header = FALSE, sep = ",", select = c(j)))
+    parents <- data.frame(parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)])
+    offspring <- data.frame(offspring1[i, c(j * 2, (j * 2) + 1)])
+    freqs <- fread(ffile, header = FALSE, sep = ",", select = c(j))
 
     
     #-----------------------------------#

@@ -12,15 +12,22 @@ These instructions assume that the files are laid out as follows:
 
 |--| code/    
 |-----|- allele-inheritance_all-in.R    
-|-----|- allele-inheritance_partial.R    
+|-----|- allele-inheritance_partial.R
+|-----|- testing_code.R
 |    
-|--| data/    
+|--| data/ 
+|-----|- all_genotypes_20.csv
+|-----|- calf_genotypes_20.csv
 |-----|- genotypes_full.csv    
 |-----|- genotypes_5000.csv    
 |-----|- offspring_5000.csv    
-|-----|- offspring_full.csv    
+|-----|- offspring_full.csv   
+|-----|- parent_genotypes_20.csv
 |-----|- parents_5000.csv    
 |-----|- parents_full.csv    
+|
+|--| test/
+|-----|- ai_test.ods
 
 Instructions and notes are also present within the code itself that may be helpful as a guide.    
 
@@ -34,25 +41,40 @@ Instructions and notes are also present within the code itself that may be helpf
     2. allele-inheritance_partial.R
         - Contains functions for conducting analyses reading in just part of the file(s) at a time.
 
-    3. offspring_5000.csv
+    3. testing_code.R
+        - Contains commands for quickly testing the code on a small data set (20 loci)
+
+    4. all_genotypes_20.csv
+        - Combined offspring and parental genotypes at 20 SNPs
+
+    5. calf_genotypes_20.csv
+        - Data for 3 offspring genotyped at 20 SNPs
+
+    6. offspring_5000.csv
         - Data for 3 offspring genotyped at 5000 SNPs
 
-    4. offspring_full.csv
+    7. offspring_full.csv
         - Data for 3 offspring genotyped at 57,704 SNPs
 
-    5. parents_5000.csv
+    8. parent_genotypes_20.csv
+        - Genotypes for the 3 parental pairs at 20 SNPs
+
+    9. parents_5000.csv
         - Genotypes for the 3 parental pairs at 5000 SNPs
         - Parents pairs must be in the same order as the offspring. For example, rows 1 and 2 must be the genotypes of the parents of the offspring in row 1 of the offspring file. Rows 3 and 4 must be the genotypes of the parents of the offspring in row 2 of the offspring file. And so on.
 
-    6. parents_full.csv
+    10. parents_full.csv
         - Genotypes for the 3 parental pairs at 57,704 SNPs
         - Parents pairs must be in the same order as the offspring. For example, rows 1 and 2 must be the genotypes of the parents of the offspring in row 1 of the offspring file. Rows 3 and 4 must be the genotypes of the parents of the offspring in row 2 of the offspring file. And so on.
 
-    7. genotypes_5000.csv
+    11. genotypes_5000.csv
         - Combined offspring and parental genotypes at 5000 SNPs
 
-    8. genotypes_full.csv
+    12. genotypes_full.csv
         - Combined offspring and parental genotypes at 57,704 SNPs
+
+    13. ai_test.ods
+        - A LibreOffice Calc file containing a manual check of the calculations for the data set of 3 triads genotyped at 20 loci
 
 -----
 
