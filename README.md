@@ -119,10 +119,10 @@ Instructions and notes are also present within the code itself that may be helpf
 `   xlab("Allele Inheritance") +`    
 `   ylab("Frequency")`    
 
-8. If you find that observed allele inheritance values are higher than expected, this may be an indicator that inbred fetuses are being lost. You can test for this using the `sim_loss` function. This function works the same as the `sim` function described above, except the user also provides a heterozygosity value (`H`) below which simulated offspring are discarded. Thus, when each offspring is generated, its heterozygosity is compared against this user-specific value. If the offspring's heterozygosity is above this value, the offspring is kept and the process continues. If the offspring's heterozygosity is below this value, the offspring is discarded and the simulation tries again. The function keeps track of how many offspring are kept and lost, so that users can get a feel for what proportion of fetuses may be lost. Users can use this function iteratively, to test what value of heterozygosity associated with fetal loss results in simulated offspring allele inheritance being similar to that observed. *Not that this function is currently only available in the* `all_in.R` *code*. You could run this function using the command below, where I am using `0.1` as the cut-off of heterozygosity values below which offspring are discarded. 
-`sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, H = 0.1, iterations = 10)`
+8. If you find that observed allele inheritance values are higher than expected, this may be an indicator that inbred fetuses are being lost. You can test for this using the `sim_loss` function. This function works the same as the `sim` function described above, except the user also provides a heterozygosity value (`H`) below which simulated offspring are discarded. Thus, when each offspring is generated, its heterozygosity is compared against this user-specific value. If the offspring's heterozygosity is above this value, the offspring is kept and the process continues. If the offspring's heterozygosity is below this value, the offspring is discarded and the simulation tries again. The function keeps track of how many offspring are kept and lost, so that users can get a feel for what proportion of fetuses may be lost. Users can use this function iteratively, to test what value of heterozygosity associated with fetal loss results in simulated offspring allele inheritance being similar to that observed. *Not that this function is currently only available in the* `all_in.R` *code*. You could run this function using the command below, where I am using `0.1` as the cut-off of heterozygosity values below which offspring are discarded.      
+`sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, H = 0.1, iterations = 10)`     
 
-You could then plot the **ai** of the 'kept' offspring to see if the result is similar to the observed data.
+You could then plot the **ai** of the 'kept' offspring to see if the result is similar to the observed data.     
 `expected2 <- read.table("sim_ai_loss.csv", header = FALSE, sep = ",")`    
 `library(ggplot2)`    
 `ggplot(expected2) +`    
@@ -132,7 +132,7 @@ You could then plot the **ai** of the 'kept' offspring to see if the result is s
 `   xlab("Allele Inheritance") +`    
 `   ylab("Frequency")`    
 
-Again you can incrementally increase the cut-off value for heterozygosity until the expected data resemble the observed. From those data, you can get an estimate of the proportion of fetuses that are lost.
+Again you can incrementally increase the cut-off value for heterozygosity until the expected data resemble the observed. From those data, you can get an estimate of the proportion of fetuses that are lost.     
 
 -----
 
