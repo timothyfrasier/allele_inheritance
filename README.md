@@ -15,14 +15,14 @@ These instructions assume that the files are laid out as follows:
 |-----|- allele-inheritance_partial.R    
 |-----|- testing_code.R    
 |    
-|--| data/   
-|-----|- all_genotypes_20.csv    
-|-----|- calf_genotypes_20.csv    
+|--| data/     
+|-----|- genotypes_20.csv    
 |-----|- genotypes_full.csv    
-|-----|- genotypes_5000.csv    
+|-----|- genotypes_5000.csv
+|-----|- offspring_20.csv
 |-----|- offspring_5000.csv    
 |-----|- offspring_full.csv   
-|-----|- parent_genotypes_20.csv    
+|-----|- parents_20.csv    
 |-----|- parents_5000.csv    
 |-----|- parents_full.csv    
 |    
@@ -44,36 +44,36 @@ Instructions and notes are also present within the code itself that may be helpf
     3. testing_code.R
         - Contains commands for quickly testing the code on a small data set (20 loci)
 
-    4. all_genotypes_20.csv
+    4. genotypes_20.csv
         - Combined offspring and parental genotypes at 20 SNPs
 
-    5. calf_genotypes_20.csv
+    5. genotypes_5000.csv
+        - Combined offspring and parental genotypes at 5000 SNPs
+
+    6. genotypes_full.csv
+        - Combined offspring and parental genotypes at 57,704 SNPs
+
+    7. offspring_20.csv
         - Data for 3 offspring genotyped at 20 SNPs
 
-    6. offspring_5000.csv
+    8. offspring_5000.csv
         - Data for 3 offspring genotyped at 5000 SNPs
 
-    7. offspring_full.csv
+    9. offspring_full.csv
         - Data for 3 offspring genotyped at 57,704 SNPs
 
-    8. parent_genotypes_20.csv
+    10. parents_20.csv
         - Genotypes for the 3 parental pairs at 20 SNPs
 
-    9. parents_5000.csv
+    11. parents_5000.csv
         - Genotypes for the 3 parental pairs at 5000 SNPs
         - Parents pairs must be in the same order as the offspring. For example, rows 1 and 2 must be the genotypes of the parents of the offspring in row 1 of the offspring file. Rows 3 and 4 must be the genotypes of the parents of the offspring in row 2 of the offspring file. And so on.
 
-    10. parents_full.csv
+    12. parents_full.csv
         - Genotypes for the 3 parental pairs at 57,704 SNPs
         - Parents pairs must be in the same order as the offspring. For example, rows 1 and 2 must be the genotypes of the parents of the offspring in row 1 of the offspring file. Rows 3 and 4 must be the genotypes of the parents of the offspring in row 2 of the offspring file. And so on.
 
-    11. genotypes_5000.csv
-        - Combined offspring and parental genotypes at 5000 SNPs
-
-    12. genotypes_full.csv
-        - Combined offspring and parental genotypes at 57,704 SNPs
-
-    13. ai_test.ods
+     13. ai_test.ods
         - A LibreOffice Calc file containing a manual check of the calculations for the data set of 3 triads genotyped at 20 loci
 
 -----
@@ -118,6 +118,21 @@ Instructions and notes are also present within the code itself that may be helpf
 `   geom_vline(xintercept = mean(observed$V1), color = "red", linewidth = 1.5, linetype = "dashed") +`    
 `   xlab("Allele Inheritance") +`    
 `   ylab("Frequency")`    
+
+8. If you find that observed allele inheritance values are higher than expected, this may be an indicator that inbred fetuses are being lost. You can test for this using the `sim_loss` function. This function works the same as the `sim` function described above, except the user also provides a heterozygosity value (`H`) below which simulated offspring are discarded. Thus, when each offspring is generated, its heterozygosity is compared against this user-specific value. If the offspring's heterozygosity is above this value, the offspring is kept and the process continues. If the offspring's heterozygosity is below this value, the offspring is discarded and the simulation tries again. The function keeps track of how many offspring are kept and lost, so that users can get a feel for what proportion of fetuses may be lost. Users can use this function iteratively, to test what value of heterozygosity associated with fetal loss results in simulated offspring allele inheritance being similar to that observed. *Not that this function is currently only available in the* `all_in.R` *code*. You could run this function using the command below, where I am using `0.1` as the cut-off of heterozygosity values below which offspring are discarded. 
+`sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, H = 0.1, iterations = 10)`
+
+You could then plot the **ai** of the 'kept' offspring to see if the result is similar to the observed data.
+`expected2 <- read.table("sim_ai_loss.csv", header = FALSE, sep = ",")`    
+`library(ggplot2)`    
+`ggplot(expected2) +`    
+`   theme_bw() +`    
+`   geom_histogram(aes(x = V1), alpha = 0.6) +`    
+`   geom_vline(xintercept = mean(observed$V1), color = "red", linewidth = 1.5, linetype = "dashed") +`    
+`   xlab("Allele Inheritance") +`    
+`   ylab("Frequency")`    
+
+Again you can incrementally increase the cut-off value for heterozygosity until the expected data resemble the observed. From those data, you can get an estimate of the proportion of fetuses that are lost.
 -----
 
 ## Running analyses reading only a portion of the data files into R at a time (example using the 5000 SNP data set, but can also use with larger data set).

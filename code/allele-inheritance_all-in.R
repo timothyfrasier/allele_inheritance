@@ -5,7 +5,7 @@
 # which offspring inherit maternal and paternal     #
 # alleles that are different from each other.       #
 #---------------------------------------------------#
-# It contains 3 main functions that users can       #
+# It contains 4 main functions that users can       #
 # employ:                                           #
 #                                                   #
 #   1. frequencies: For calculating allele          #
@@ -16,15 +16,28 @@
 #                                                   #
 #   3. sim: For simulating offspring from parental  #
 #      genotypes and calculating their ai.          #
+#                                                   #
+#   4. sim_loss: For simulating offspring from      #
+#      parental genotypes, and only keeping those   #
+#      whose heterozygosity is above a user-        #
+#      specified value, and calculating the ai of   #
+#      the kept offspring. The number of offspring  #
+#      "lost" is also recorded.                     #
 #---------------------------------------------------#
-# It also contains 2 "helper" functions, that the   #
+# It also contains 3 "helper" functions, that the   #
 # user does not interact with directly, but rather  #
 # are called upon by other functions. These are:    #
 #                                                   #
-#   4. mendel: Simulates offspring from known       #
+#   5. mendel: Simulates offspring from known       #
 #      parents (used in the sim function).          #
 #                                                   #
-#   5. aisim: Calculates allele inheritance for the #
+#   6. mendel_loss: Simulates offspring from known  #
+#      parents and only keeps those whose           #
+#      heterozygoity is above a user-specified      #
+#      value. Keeps track of how many offspring are #
+#      kept and lost.                               #
+#                                                   #
+#   7. aisim: Calculates allele inheritance for the #
 #      simulated offspring (used in the sim         #
 #      function). Code is the same as in the ai     #
 #      function, but some input and output options  #
@@ -33,7 +46,7 @@
 #                                                   #
 #                        by                         #
 #                    Tim Frasier                    #
-#              Last Updated: 10-JUL-2026            #
+#              Last Updated: 27-AUG-2026            #
 #####################################################
 
 
@@ -280,6 +293,75 @@ sim <- function(pfile, ffile, nLoci, nTriads, iterations) {
   file.remove("simOff.csv")
   print("Done! Results written to file sim_ai.csv.")
 }  
+
+
+############################################################
+#                   4. sim_loss                            #
+#                                                          #
+# This function runs two other functions (mendel and aisim)#
+# to simulate offspring from each mating pair by randomly  #
+# selecting one allele from each parent, and then          #
+# calculates the average allele inheritance across the     #
+# simulated data set. Thus, the output is one value of     #
+# allele inheritance (the mean for all offspring) for each #
+# iteration.                                               #
+#----------------------------------------------------------#
+# It requires 5 pieces of information from the user:       #
+#                                                          #
+#   1. pfile: The name (and path to) the file containing   #
+#      the parental genotypes.                             #
+#                                                          #
+#   2. ffile: The name (and path to) the file containing   #
+#      the allele frequencies (generated using the         #
+#      frequencies function of this package.               #
+#                                                          #
+#   3. nLoci: The number of loci used.                     #
+#                                                          #
+#   4. nTriads: The number of triads being analyzed.       #
+#                                                          #
+#   5. iterations: The number of iterations to conduct     #
+#      (i.e., the number of simulated data sets to create  #
+#      and then analyse).                                  #
+#                                                          #
+############################################################
+
+sim_loss <- function(pfile, ffile, nLoci, nTriads, H, iterations) {
+  
+  #-------------------------------#
+  #    Load Necessary Packages    #
+  #-------------------------------#
+  library(data.table)
+  
+  # Vector for holding results
+  sim_ai <- rep(NA, times = iterations)
+  lost <- data.frame(matrix(NA, nrow = iterations, ncol = 2))
+  
+  for (n in 1:iterations) {
+    
+    # Generate simulated offspring
+    mendel_loss(pfile = pfile, nTriads = nTriads, nLoci = nLoci, H = H, n = n)
+    
+    # Get number of kept and lost offspring
+    lost[n, ] <- read.table("kept_and_lost.csv", header = FALSE, sep = ",")
+    
+    # Calculated their allele-inheritance
+    sim_ai[n] <- aisim(pfile = pfile, ffile = ffile, nLoci = nLoci, nTriads = nTriads, n = n)
+    
+  }
+  
+  # Deal with simulated offspring information
+  write.table(sim_ai, "sim_ai_loss.csv", sep = ",", quote = FALSE, row.names = FALSE, col.names = FALSE)
+  file.remove("simOff.csv")
+  
+  # Deal with kept and lost counts
+  lost_totals <- apply(lost, 1, sum)
+  number <- 1:iterations
+  lost1 <- cbind(number, lost, lost_totals)
+  colnames(lost1) <- c("Iteration", "Kept", "Lost", "Total")
+  write.table(lost1, "count_lost.csv", sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
+  file.remove("kept_and_lost.csv")
+  print("Done! Results written to files sim_ai_loss.csv and count_loss.csv.")
+}  
   
   
 #----------------------------------------------------------------------------#
@@ -295,11 +377,7 @@ sim <- function(pfile, ffile, nLoci, nTriads, iterations) {
 # This function takes parental genotypes   #
 # and generates simulated offspring by     #
 # randomly selecting one allele from each  #
-# parent. It then calculates the allele-   #
-# inheritance of those offspring and       #
-# returns the average ai for those         #
-# simulated offspring.                     #
-#------------------------------------------#
+# parent.                                  #
 ############################################
 
 mendel <- function(pfile, nTriads, nLoci, n) {
@@ -340,6 +418,99 @@ for (i in 1:nTriads) {
   }
 }
 write.table(offspring, "simOff.csv", col.names = FALSE, row.names = FALSE, sep = ",")
+}
+
+
+############################################
+#             mendel_loss                  #
+#                                          #
+# This function takes parental genotypes   #
+# and generates simulated offspring by     #
+# randomly selecting one allele from each  #
+# parent. After it generates a simulated   #
+# offspring, it checks whether or not it   #
+# has a heterozygosity above a user-       #
+# defined value. If so, the offspring is   #
+# kept. If not, the offspring is discarded #
+# and the process is repeated until an     #
+# offspring that meets the criterion is    #
+# generated. The number of offspring kept  #
+# and discarded is recorded.               #
+############################################
+
+mendel_loss <- function(pfile, nTriads, nLoci, H, n) {
+  
+  # Create file for holding simulated offspring
+  offspring <- matrix(NA, nrow = nTriads, ncol = ((2 * nLoci) + 1))
+  
+  # Create variable to hold kept and lost offspring
+  kept <- 0
+  lost <- 0
+  
+  # Get parental data
+  parents1 <- data.frame(fread(pfile, header = FALSE, sep = ","))
+  
+  i <- 1
+  while (i <= nTriads) {
+    
+    # Number simulated offspring
+    offspring[i, 1] <- i
+    
+    for (j in 1:nLoci) {
+      
+      #--- Print progress to screen (every 500th step) ---#
+      if (j %% 500 == 0) {
+        print(paste("Iteration", n, "Simulating offspring", i, "locus", j))
+      }
+      
+      #-------------------------------#
+      # Get appropriate parental data #
+      #-------------------------------#
+      parents <- parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)]
+      
+      #-----------------------#
+      #  Generate Offspring   #
+      #-----------------------#
+      if (sum(parents == 0) > 0) {
+        offspring[i, j * 2] <- 0
+        offspring[i, (j * 2) + 1] <- 0
+      } else {
+        offspring[i, (j * 2)] <- sample(as.numeric(parents[1, ]), size = 1, replace = FALSE)
+        offspring[i, (j * 2) + 1] <- sample(as.numeric(parents[2, ]), size = 1, replace = FALSE)
+      }
+    }
+    
+    #-----------------------------------#
+    # Check if Offspring Meets Criteria #
+    #-----------------------------------#
+    #--- Count Typed Loci ---#
+    typed <- nLoci - (sum(offspring[i,] == 0) / 2)
+    
+    #--- Count Heterozygous Loci ---#
+    het <- 0
+    for (k in 1:nLoci) {
+      if (offspring[i, (k * 2)] == offspring[i, ((k * 2) + 1)]) {
+        het <- het
+      } else {
+        het <- het + 1
+      }
+    }
+    h <- het / typed
+    if (h > H) {
+      i <- i + 1
+      kept <- kept + 1
+      print("Kept one :)")
+    } else {
+      i <- i
+      lost <- lost + 1
+      print("Lost one :(")
+    }
+  }
+  
+  #--- Organize results as data.frame ---#
+  results <- data.frame(kept, lost)
+  write.table(results, "kept_and_lost.csv", col.names = FALSE, row.names = FALSE, sep = ",")
+  write.table(offspring, "simOff.csv", col.names = FALSE, row.names = FALSE, sep = ",")
 }
 
 
