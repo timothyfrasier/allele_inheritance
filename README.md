@@ -12,22 +12,22 @@ These instructions assume that the files are laid out as follows:
 
 |--| code/    
 |-----|- allele-inheritance_all-in.R    
-|-----|- allele-inheritance_partial.R
-|-----|- testing_code.R
+|-----|- allele-inheritance_partial.R    
+|-----|- testing_code.R    
 |    
-|--| data/ 
-|-----|- all_genotypes_20.csv
-|-----|- calf_genotypes_20.csv
+|--| data/   
+|-----|- all_genotypes_20.csv    
+|-----|- calf_genotypes_20.csv    
 |-----|- genotypes_full.csv    
 |-----|- genotypes_5000.csv    
 |-----|- offspring_5000.csv    
 |-----|- offspring_full.csv   
-|-----|- parent_genotypes_20.csv
+|-----|- parent_genotypes_20.csv    
 |-----|- parents_5000.csv    
 |-----|- parents_full.csv    
-|
-|--| test/
-|-----|- ai_test.ods
+|    
+|--| test/    
+|-----|- ai_test.ods    
 
 Instructions and notes are also present within the code itself that may be helpful as a guide.    
 
