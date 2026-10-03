@@ -2,7 +2,7 @@
 
 These scripts are an R adaptation of the C code described in Frasier (2008), which is implemented in the STORM program for testing hypotheses regarding allele inheritance. Specifically, they allow users to test the hypothesis that offspring inherit paternal alleles differing from the maternal alleles more/less often than expected given the parents genotypes and Mendelian inheritance.    
 
-There are two versions of the scripts: one that reads entire data files into R, and another that only reads part of the data files into R at a time. There are two example data sets, each containing three files: a file containing offspring genotypes, a file containing the parental genotypes, and a file containing all genotypes combined for use in calculating allele frequencies.    
+There are two versions of the scripts: one that reads entire data files into R, and another that only reads part of the data files into R at a time. There are three example data sets, each containing three files: a file containing offspring genotypes, a file containing the parental genotypes, and a file containing all genotypes combined for use in calculating allele frequencies.    
 
 These instructions assume that the files are laid out as follows:
     - The data files are in a "data" directory,
@@ -11,7 +11,7 @@ These instructions assume that the files are laid out as follows:
       "code" directory    
 
 |--| code/    
-|-----|- allele-inheritance_all-in.R    
+|-----|- allele-inheritance.R    
 |-----|- allele-inheritance_partial.R    
 |-----|- testing_code.R    
 |    
@@ -35,7 +35,7 @@ Instructions and notes are also present within the code itself that may be helpf
 
 ## File Descriptions:     
 
-    1. allele-inheritance_all_in.R
+    1. allele-inheritance.R
         - Contains functions for conducting analyses reading in the entire data files into R.
 
     2. allele-inheritance_partial.R
@@ -83,7 +83,7 @@ Instructions and notes are also present within the code itself that may be helpf
 1. Open RStudio and make the "code" directory R's working directory    
 
 2. Load the script into R, so that the functions are available to you    
-`source("allele-inheritance_all-in.R")`
+`source("allele-inheritance.R")`
 
 3. Make sure that you have the `data.table` package installed    
 
@@ -100,13 +100,13 @@ Instructions and notes are also present within the code itself that may be helpf
     e. The number of mother-father-triads ("nTriads")    
 `ai(pfile = "../data/parents_5000.csv", ofile = "../data/offspring_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3)`
 
-6. Use the `sim` function to generate simulated offspring from each parental pair. **This will take a while to run!** Progress updates will be written to your screen so that you can keep track of progress. But you will need to be patient and have other things to do in the meantime (or perhaps go to sleep and check it in the morning). The output will be a file called `sim_ai.csv` that contains *one value* for each iteration (the average ai across *all* simulated  offspring for that iteration). The result will be a distribution of expected allele inheritance values given just Mendelian inheritance. Requires five arguments:    
+6. Use the `sim` function to generate simulated offspring from each parental pair. Progress updates will be written to your screen so that you can keep track of progress. The output will be a file called `sim_ai.csv` that contains *one value* for each iteration (the average ai across *all* simulated  offspring for that iteration). The result will be a distribution of expected allele inheritance values given just Mendelian inheritance. Requires five arguments:    
     a. The name and relative path to the parental genotype file ("pfile"). File *must* be comma-delimited    
     b. The name and relative path to the allele frequency file ("ffile")    
     c. The number of loci ("nLoci")    
     d. The number of triads ("nTriads")    
-    e. The number of iterations that you want to conduct (i.e., how many simulated offspring do you want to generate for each parental pair?). I just use 20 here, but to get a good distribution of "expected" values, you should run more (e.g., 500 or 1000).    
-`sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, iterations = 10)`
+    e. The number of iterations that you want to conduct (i.e., how many simulated offspring do you want to generate for each parental pair?). I just use 100 here, but to get a good distribution of "expected" values, you may need to run more.    
+`sim(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, iterations = 100)`
 
 7. You can then compare and visualize the difference between observed and expected values using standard R functions. One example is to plot a histogram of the expected values, and then a red dashed line where the observed value is. Example commands for this are below. *Note that the calculation is how often a paternal allele is inherited that is different from the maternal allele, so observed values larger than expected mean that homozygotes are missing from your data set, and vice versa.*     
 `observed <- read.table("observed_ai.csv", header = FALSE, sep = ",")`    
@@ -119,18 +119,8 @@ Instructions and notes are also present within the code itself that may be helpf
 `   xlab("Allele Inheritance") +`    
 `   ylab("Frequency")`    
 
-8. If you find that observed allele inheritance values are higher than expected, this may be an indicator that inbred fetuses are being lost. You can test for this using the `sim_loss` function. This function works the same as the `sim` function described above, except the user also provides a heterozygosity value (`H`) below which simulated offspring are discarded. Thus, when each offspring is generated, its heterozygosity is compared against this user-specific value. If the offspring's heterozygosity is above this value, the offspring is kept and the process continues. If the offspring's heterozygosity is below this value, the offspring is discarded and the simulation tries again. The function keeps track of how many offspring are kept and lost, so that users can get a feel for what proportion of fetuses may be lost. Users can use this function iteratively, to test what value of heterozygosity associated with fetal loss results in simulated offspring allele inheritance being similar to that observed. *Not that this function is currently only available in the* `all_in.R` *code*. You could run this function using the command below, where I am using `0.1` as the cut-off of heterozygosity values below which offspring are discarded.      
-`sim_loss(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, H = 0.1, iterations = 10)`     
-
-You could then plot the **ai** of the 'kept' offspring to see if the result is similar to the observed data.     
-`expected2 <- read.table("sim_ai_loss.csv", header = FALSE, sep = ",")`    
-`library(ggplot2)`    
-`ggplot(expected2) +`    
-`   theme_bw() +`    
-`   geom_histogram(aes(x = V1), alpha = 0.6) +`    
-`   geom_vline(xintercept = mean(observed$V1), color = "red", linewidth = 1.5, linetype = "dashed") +`    
-`   xlab("Allele Inheritance") +`    
-`   ylab("Frequency")`    
+8. If you find that observed allele inheritance values are higher than expected, this may be an indicator that inbred fetuses are being lost. You can test for this using the `sim_loss` function. This function works the same as the `sim` function described above, except the user also provides a heterozygosity value (`H`) below which simulated offspring are discarded. Thus, when each offspring is generated, its heterozygosity is compared against this user-specific value. If the offspring's heterozygosity is above this value, the offspring is kept and the process continues. If the offspring's heterozygosity is below this value, the offspring is discarded and the simulation tries again. The function keeps track of how many offspring are kept and lost, so that users can get a feel for what proportion of fetuses may be lost. Users can use this function iteratively, to test what value of heterozygosity associated with fetal loss results in simulated offspring allele inheritance being similar to that observed. *Not that this function is currently only available in the* `all_in.R` *code*. You could run this function using the command below, where I am using `0.19` as the cut-off of heterozygosity values below which offspring are discarded.      
+`sim_loss(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, H = 0.19, iterations = 100)`     
 
 Again you can incrementally increase the cut-off value for heterozygosity until the expected data resemble the observed. From those data, you can get an estimate of the proportion of fetuses that are lost.     
 
