@@ -379,7 +379,7 @@ sim_loss <- function(pfile, ffile, nLoci, nTriads, H, iterations) {
   lost1 <- cbind(number, lost, lost_totals)
   colnames(lost1) <- c("Iteration", "Kept", "Lost", "Total")
   write.table(lost1, "count_lost.csv", sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
-  print("Done! Results written to files sim_ai_loss.csv and count_loss.csv.")
+  print("Done! Results written to files sim_ai_loss.csv and count_lost.csv.")
 }  
   
   
