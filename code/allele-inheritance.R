@@ -19,9 +19,8 @@
 #                                                   #
 #   4. sim_loss: For simulating offspring from      #
 #      parental genotypes, and only keeping those   #
-#      whose heterozygosity is above a user-        #
-#      specified value, and calculating the ai of   #
-#      the kept offspring. The number of offspring  #
+#      whose allele-inheritance value is above a    #
+#      user-specified value. The number of offspring#
 #      "lost" is also recorded.                     #
 #---------------------------------------------------#
 # It also contains 3 "helper" functions, that the   #
@@ -33,9 +32,9 @@
 #                                                   #
 #   6. mendel_loss: Simulates offspring from known  #
 #      parents and only keeps those whose           #
-#      heterozygoity is above a user-specified      #
-#      value. Keeps track of how many offspring are #
-#      kept and lost.                               #
+#      allele-inheritance values is above a         #
+#      user-specified value. Keeps track of how     #
+#      many offspring are kept and lost.            #
 #                                                   #
 #   7. aisim: Calculates allele inheritance for the #
 #      simulated offspring (used in the sim         #
@@ -46,7 +45,7 @@
 #                                                   #
 #                        by                         #
 #                    Tim Frasier                    #
-#              Last Updated: 03-OCT-2026            #
+#              Last Updated: 08-OCT-2026            #
 #####################################################
 
 
@@ -296,7 +295,7 @@ sim <- function(pfile, ffile, nLoci, nTriads, iterations) {
     # Generate simulated offspring
     simOff <- mendel(parents1 = parents1, nTriads = nTriads, nLoci = nLoci, n = n)
     
-    # Calculated their allele-inheritance
+    # Calculate their allele-inheritance
     sim_ai[n] <- aisim(parents1 = parents1, simOff = simOff, freqs1 = freqs1, nLoci = nLoci, nTriads = nTriads, n = n)
   }
   write.table(sim_ai, "sim_ai.csv", sep = ",", quote = FALSE, row.names = FALSE, col.names = FALSE)
@@ -328,8 +327,8 @@ sim <- function(pfile, ffile, nLoci, nTriads, iterations) {
 #                                                          #
 #   4. nTriads: The number of triads being analyzed.       #
 #                                                          #
-#   5. H: The heterozygosity below which simulated         #
-#         offspring are discarded.                         #
+#   5. crit_ai: The "critical" allele inheritance value    #
+#      below which simulated offspring are discarded.      #
 #                                                          #
 #   6. iterations: The number of iterations to conduct     #
 #      (i.e., the number of simulated data sets to create  #
@@ -337,7 +336,7 @@ sim <- function(pfile, ffile, nLoci, nTriads, iterations) {
 #                                                          #
 ############################################################
 
-sim_loss <- function(pfile, ffile, nLoci, nTriads, H, iterations) {
+sim_loss <- function(pfile, ffile, nLoci, nTriads, crit_ai, iterations) {
   
   #-------------------------------#
   #    Load Necessary Packages    #
@@ -359,7 +358,7 @@ sim_loss <- function(pfile, ffile, nLoci, nTriads, H, iterations) {
     }
     
     # Generate simulated offspring
-    Sim <- mendel_loss(parents1 = parents1, nTriads = nTriads, nLoci = nLoci, H = H, n = n)
+    Sim <- mendel_loss(parents1 = parents1, freqs1 = freqs1, nTriads = nTriads, nLoci = nLoci, crit_ai = crit_ai, n = n)
     simOff <- Sim[[1]]
     
     # Get number of kept and lost offspring
@@ -450,7 +449,7 @@ return(offspring)
 # and discarded is recorded.               #
 ############################################
 
-mendel_loss <- function(parents1, nTriads, nLoci, H, n) {
+mendel_loss <- function(parents1, freqs1, nTriads, nLoci, crit_ai, n) {
   
   # Create file for holding simulated offspring
   offspring <- matrix(NA_integer_, nrow = nTriads, ncol = ((2 * nLoci) + 1))
@@ -486,22 +485,84 @@ mendel_loss <- function(parents1, nTriads, nLoci, H, n) {
     }
     
     #-----------------------------------#
-    # Check if Offspring Meets Criteria #
+    # Calculate Allele Inheritance      #
     #-----------------------------------#
-    #--- Count Typed Loci ---#
-    typed <- (nLoci - (sum(offspring[i,] == 0)) / 2)
+    # Vector to hold Expected Heterozygosity
+    het <- rep(NA_integer_, times = nLoci)
     
-    #--- Count Heterozygous Loci ---#
-    het <- 0
-    for (k in 1:nLoci) {
-      if (offspring[i, (k * 2)] == offspring[i, ((k * 2) + 1)]) {
-        het <- het
+    # Vector to hold the number of typed loci
+    typed <- rep(NA_integer_, times = nLoci)
+    
+    # Vector to hold the number of informative loci
+    iLoci <- rep(NA_integer_, times = nLoci)
+    
+    # Vector to hold if inherited alleles differ
+    differ <- rep(NA_integer_, times = nLoci)
+    
+    # Variable to hold allele inheritance value
+    allele_inheritance <- NA_real_
+    
+    for (j in 1:nLoci) {
+      
+      freqs <- freqs1[, j]
+      parents2 <- parents1[((i * 2) - 1):(i * 2), (j * 2):((j * 2) + 1)]
+      offspring2 <- offspring[i, (j * 2):((j * 2) + 1)]
+      
+      #-----------------------------------#
+      # Calculate Expected Heterozygosity #
+      #-----------------------------------#
+      if ((sum(parents2 == 0) + sum(offspring2 == 0)) > 0) {
+        het[j] <- 0
+        typed[j] <- 0
       } else {
-        het <- het + 1
+        het[j] <- 1 - (freqs[1]^2 + freqs[2]^2)
+        typed[j] <- 1
+      }
+      
+      
+      #---------------------------------#
+      #  Is Locus Informative?          #
+      #---------------------------------#
+      if (typed[j] == 0) {
+        iLoci[j] <- 0
+      } else {
+        if (sum(parents2) == 5) {
+          iLoci[j] <- 1
+        } else {
+          if ((sum(parents2) == 6) && (parents2[1, 1] != parents2[1, 2])) {
+            iLoci[j] <- 1
+          } else {
+            if (sum(parents2) == 7) {
+              iLoci[j] <- 1
+            } else {
+              iLoci[j] <- 0
+            }
+          }
+        }
+      }
+      
+      #-----------------------------------#
+      #     Do Alleles Differ?            #
+      #-----------------------------------#
+      if (typed[j] == 0) {
+        differ[j] <- 0
+      } else {
+        if (iLoci[j] == 0) {
+          differ[j] <- 0
+        } else {
+          if(offspring2[1] == offspring2[2]) {
+            differ[j] <- 0
+          } else {
+            differ[j] <- 1
+          }
+        }
       }
     }
-    h <- het / typed
-    if (h > H) {
+    
+    allele_inheritance <- (sum(differ) / sum(iLoci)) / (sum(het) / sum(typed))
+    
+    #--- Does it meet criterion? ---#
+    if (allele_inheritance >= crit_ai) {
       i <- i + 1
       kept <- kept + 1
     } else {
