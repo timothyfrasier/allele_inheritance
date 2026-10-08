@@ -181,8 +181,8 @@ for (i in 1:nTriads) {
     #---------------------------------------------------------#
     # Get appropriate parental, offspring, and frequency data #
     #---------------------------------------------------------#
-    parents   <- parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)]
-    offspring <- offspring1[i, c(j * 2, (j * 2) + 1)]
+    parents   <- parents1[((i * 2) - 1):(i * 2), (j * 2):((j * 2) + 1)]
+    offspring <- offspring1[i, (j * 2):((j * 2) + 1)]
     freqs     <- freqs1[, j]
 
     
@@ -414,7 +414,7 @@ for (i in 1:nTriads) {
     #-------------------------------#
     # Get appropriate parental data #
     #-------------------------------#
-    parents <- parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)]
+    parents <- parents1[((i * 2) - 1):(i * 2), (j * 2):((j * 2) + 1)]
     
     #-----------------------#
     #  Generate Offspring   #
@@ -470,7 +470,7 @@ mendel_loss <- function(parents1, freqs1, nTriads, nLoci, crit_ai, n) {
       #-------------------------------#
       # Get appropriate parental data #
       #-------------------------------#
-      parents <- parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)]
+      parents <- parents1[((i * 2) - 1):(i * 2), (j * 2):((j * 2) + 1)]
       
       #-----------------------#
       #  Generate Offspring   #
@@ -612,8 +612,8 @@ aisim <- function(parents1, simOff, freqs1, nLoci, nTriads, n) {
       #---------------------------------------------------------#
       # Get appropriate parental, offspring, and frequency data #
       #---------------------------------------------------------#
-      parents <- parents1[((i * 2) - 1):(i * 2), c(j * 2, (j * 2) + 1)]
-      offspring <- simOff[i, c(j * 2, (j * 2) + 1)]
+      parents <- parents1[((i * 2) - 1):(i * 2), (j * 2):((j * 2) + 1)]
+      offspring <- simOff[i, (j * 2):((j * 2) + 1)]
       
       freqs <- freqs1[, j]
       

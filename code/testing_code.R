@@ -34,8 +34,8 @@ ggplot(exp) +
 
 
 # How Heterozygous Must Calves Be To Survive?
-# crit_ai = 5
-sim_loss(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, crit_ai = 5, iterations = 100)
+# crit_ai = 2.5
+sim_loss(pfile = "../data/parents_5000.csv", ffile = "freqs.csv", nLoci = 5000, nTriads = 3, crit_ai = 2.5, iterations = 100)
 
 # Visualize results
 obs <- read.table("observed_ai.csv", header = FALSE, sep = ",")
